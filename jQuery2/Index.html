@@ -1,0 +1,285 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>jQuery Test</title>
+    <script src="Project_Scripts/Settings.js"></script>
+    <script src="Project_Scripts/IndexHelper.js"></script>
+    <script src="Scripts/jquery-3.3.1.min.js"></script>
+    <!---Nødvendig at inkludere jQuery script filen herunder for at vi
+        kan lave Cross-Domain requests !!! -->
+    <!--<script src="Scripts/jquery.ajax-cross-origin.min.js"></script>-->
+    <link href="Content/bootstrap.css" rel="stylesheet" />
+    <script src="Scripts/bootstrap.js"></script>
+    <link href="StyleSheet/StyleSheet.css" rel="stylesheet" />
+</head>
+
+<body>
+    <div class="table-responsive">
+        <table id="tblDynamic" class="table table-bordered">
+            <thead>
+                <tr>
+                    <td>Student ID</td>
+                    <td>Student Fornavn + Efternavn</td>
+                    <td>Ret Student</td>
+                    <td>Slet Student</td>
+                </tr>
+            </thead>
+            <tbody class="StudentData"></tbody>
+        </table>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <label for="lblStudentFirstAndLastName">Indtast Elev Fornavn og Efternavn : </label>
+            <input type="text" id="txtStudentFirstAndLastName" />
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <button type="button" id="btnStudentNameHandle" value="StudentOperation_ENUM.Save_Student_Data">Indsæt nyt Student Navn</button>
+        </div>
+    </div>
+
+    <div class="ErrorMessages">
+
+    </div>
+</body>
+
+</html>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        var numberOfRowsInTable = 0;
+        var EditStudentNameClassName = "EditStudentName";
+        var DeleteStudentNameClassName = "DeleteStudentName";
+
+        var CurrentUserSelection = StudentOperation_ENUM.Save_Student_Data;
+
+        /* ajaxSetup koden herunder skal være der, ellers kan vi
+             * ikke udføre Cross Domain requests til vores WEB Api, som
+             * meget let kan være hosted på en anden Server. */
+        //$.ajaxSetup({
+        //    crossOrigin: true,
+        //    crossDomain: true
+        //});
+
+        GetStudentData();
+
+        function UpdatePagerForSide() {
+
+        }
+
+        function GetStudentData() {
+            $(".StudentData").empty();
+
+            $.ajax({
+                url: WEB_API_URL_Student,
+                type: 'GET',
+                //context: {},
+                dataType: "json",
+                //mimeType: 'text/html',
+                //contentType: 'text/html',
+                crossDomain:true,
+                //headers: {
+                //    //"Access-Control-Allow-Origin": "*",
+                //    "Accept": "application/json"
+                //},
+                headers: {
+                    accept: "application/json",
+                    //"content-type": "application/json",
+                    //"Access-Control-Allow-Origin": '*'
+                },
+                success: function (data) {
+                    try {
+                        jSonDataDeserialized = JSON.parse(data);
+                        DecodejSONStudentData(jSonDataDeserialized);
+                        UpdatePagerForSide();
+                    }
+                    catch (Exception) {
+                       try {
+                            jSonDataDeserialized = JSON.parse(JSON.stringify(data));
+                            DecodejSONStudentData(jSonDataDeserialized);
+                            UpdatePagerForSide();
+                        }
+                        catch (Exception) {
+                            try {
+                                DecodejSONStudentData(data);
+                                UpdatePagerForSide();
+                            }
+                            catch (Exception) {
+                                $(".ErrorMessages").text(Exception);
+                            }
+                        }
+                    }
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    alert(xhr.status);
+                    alert(thrownError);
+                }
+            });
+        }
+
+        function DecodejSONStudentData(jSonDataDeserialized) {
+            $.each(jSonDataDeserialized, function (key, item) {
+                AddDataRowToTable(item.StudentNameID, item.StudentFirstAndLastName);
+            });
+        }
+
+        function AddDataRowToTable(StudentNameID, StudentFirstAndLastName) {
+            WorkString = "<tr class='StudentNames'>";
+            WorkString += "<td>";
+            WorkString += StudentNameID;
+            WorkString += "<td class='StudentFirstAndLastName'>";
+            WorkString += StudentFirstAndLastName;
+            WorkString += "<td>";
+            WorkString += "<button type='button'";
+            WorkString += "value='" + StudentNameID + "' ";
+            WorkString += "class='" + EditStudentNameClassName + "'";
+            WorkString += ">Ret Studerende Navn (" + StudentNameID + ") </button>";
+            WorkString += "<td>";
+            WorkString += "<button type='button'";
+            WorkString += "value='" + StudentNameID + "' ";
+            WorkString += "class='" + DeleteStudentNameClassName + "'";
+            WorkString += ">Slet Studerende Navn (" + StudentNameID + ") </button>";
+            WorkString += "</tr>";
+            $(".StudentData").append(WorkString);
+        }
+
+        $("#btnStudentNameHandle").click(function () {
+            var StudentFirstAndLastName = $("#txtStudentFirstAndLastName").val();
+            if (StudentOperation_ENUM.Save_Student_Data == CurrentUserSelection) {
+                var data = { StudentFirstAndLastName: StudentFirstAndLastName }
+                $.ajax({
+                    url: WEB_API_URL_Student,
+                    method: 'POST',
+                    type: 'POST',
+                    //contentType: 'application/json',
+                    data: JSON.stringify(data),
+                    //crossDomain: true,
+                    dataType: 'json',
+                    //mimeType: 'text/html',
+                    //contentType: 'text/html',
+                    //crossDomain: true,
+                    //headers: {
+                    //    "Access-Control-Allow-Origin": "*",
+                    //    "Accept": "application/json"
+                    //},
+
+                    headers: {
+                        accept: "application/json",
+                        "content-type": "application/json",
+                        //"Access-Control-Allow-Origin": '*'
+                    },
+                    success: function (dataBack) {
+                        //On ajax success do this
+                        if (0 < dataBack) {
+                            AddDataRowToTable(dataBack, StudentFirstAndLastName);
+                            $("#txtStudentFirstAndLastName").val("");
+                        }
+                        else {
+                            alert("Noget gik galt, da StudentName " + StudentFirstAndLastName + " skulle gemmes !!!");
+                            alert(dataBack);
+                        }
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        //On error do this
+                        alert(ajaxOptions);
+                    }
+                });
+            }
+            else {
+                var data = { StudentNameID: StudentNameID, StudentFirstAndLastName: StudentFirstAndLastName }
+                $.ajax({
+                    url: WEB_API_URL_Student + "?id=" + StudentNameID,
+                    type: 'PUT',
+                    contentType: 'application/json',
+                    data: JSON.stringify(data),
+                    dataType: 'json',
+                    mimeType: 'text/html',
+                    contentType: 'text/html',
+                    headers: {
+                        Accept: "application/json",
+                        "content-type": "application/json",
+                    },
+                    success: function (dataBack) {
+                        //On ajax success do this
+                        if (true == dataBack) {
+                            CurrentRowCells = CurrentRow.children();
+                            CurrentRowCells.eq(1).text($("#txtStudentFirstAndLastName").val());
+                            $("#txtStudentFirstAndLastName").val("");
+                            CurrentUserSelection = StudentOperation_ENUM.Save_Student_Data;
+                            HandleButtonValueAndText(CurrentUserSelection);
+                        }
+                        else {
+                            alert("Noget gik galt, da StudentName " + StudentFirstAndLastName + " skulle opdateres !!!");
+                        }
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        //On error do this
+                        alert(ajaxOptions);
+                    }
+                });
+            }
+        });
+
+        $('body').on('click', '.' + DeleteStudentNameClassName, function () {
+            StudentNameID = $(this).val();
+            CurrentRow = $(this).closest('tr');
+            CurrentRowCells = CurrentRow.children();
+            StudentFirstAndLastName = CurrentRowCells.eq(1).text();
+
+            if (confirm("Ønsker du slette studenten " + StudentFirstAndLastName + " ?")) {
+                var data = { StudentNameID: StudentNameID, StudentFirstAndLastName: StudentFirstAndLastName }
+                $.ajax({
+                    url: WEB_API_URL_Student + "?id=" + StudentNameID,
+                    type: 'DELETE',
+                    contentType: 'application/json',
+                    dataType: 'json',
+                    mimeType: 'text/html',
+                    contentType: 'text/html',
+                    //headers: {
+                    //    "Access-Control-Allow-Origin": "*",
+                    //    "Accept": "application/json"
+                    //},
+                    headers: {
+                        Accept: "application/json",
+                        "content-type": "application/json",
+                    },
+                    success: function (data) {
+                        //On ajax success do this
+                        CurrentRow.remove();
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        //On error do this
+                        alert(ajaxOptions);
+                    }
+                });
+            }
+        });
+
+        $('body').on('click', '.' + EditStudentNameClassName, function () {
+            StudentNameID = $(this).val();
+            CurrentRow = $(this).closest('tr');
+            CurrentRowCells = CurrentRow.children();
+            StudentFirstAndLastName = CurrentRowCells.eq(1).text();
+
+            $("#txtStudentFirstAndLastName").val(StudentFirstAndLastName);
+            CurrentUserSelection = StudentOperation_ENUM.Edit_Student_Data;
+            HandleButtonValueAndText(CurrentUserSelection);
+        });
+
+        function HandleButtonValueAndText(ButtonState) {
+            $("#btnStudentNameHandle").val(ButtonState);
+            if (StudentOperation_ENUM.Save_Student_Data == ButtonState) {
+                $("#btnStudentNameHandle").text("Indsæt nyt Student Navn");
+            }
+            else {
+                $("#btnStudentNameHandle").text("Ret Student Navn");
+            }
+        }
+    });
+
+</script>
