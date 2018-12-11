@@ -4,15 +4,15 @@
 <head>
     <meta charset="utf-8" />
     <title>jQuery Test</title>
-    <script src="Project_Scripts/Settings.js"></script>
-    <script src="Project_Scripts/IndexHelper.js"></script>
     <script src="Scripts/jquery-3.3.1.min.js"></script>
-    <!---Nødvendig at inkludere jQuery script filen herunder for at vi
-        kan lave Cross-Domain requests !!! -->
-    <!--<script src="Scripts/jquery.ajax-cross-origin.min.js"></script>-->
-    <link href="Content/bootstrap.css" rel="stylesheet" />
+    <!--<script src="Scripts/jquery.validate.js"></script>-->
     <script src="Scripts/bootstrap.js"></script>
+    <!--<script src="Scripts/respond.js"></script>-->
+    <link href="Content/bootstrap.css" rel="stylesheet" />
     <link href="StyleSheet/StyleSheet.css" rel="stylesheet" />
+    <script type="text/javascript" src="Project_Scripts/Settings.js"></script>
+    <script type="text/javascript" src="Project_Scripts/IndexHelper.js"></script>
+    <script type="text/javascript" src="Project_Scripts/JavaScript_Paging_Dynamic13.js"></script>
 </head>
 
 <body>
@@ -58,68 +58,24 @@
 
         var CurrentUserSelection = StudentOperation_ENUM.Save_Student_Data;
 
-        /* ajaxSetup koden herunder skal være der, ellers kan vi
-             * ikke udføre Cross Domain requests til vores WEB Api, som
-             * meget let kan være hosted på en anden Server. */
-        //$.ajaxSetup({
-        //    crossOrigin: true,
-        //    crossDomain: true
-        //});
-
         GetStudentData();
 
         function UpdatePagerForSide() {
-
-        }
-
-        function GetStudentData() {
-            $(".StudentData").empty();
-
-            $.ajax({
-                url: WEB_API_URL_Student,
-                type: 'GET',
-                //context: {},
-                dataType: "json",
-                //mimeType: 'text/html',
-                //contentType: 'text/html',
-                crossDomain:true,
-                //headers: {
-                //    //"Access-Control-Allow-Origin": "*",
-                //    "Accept": "application/json"
-                //},
-                headers: {
-                    accept: "application/json",
-                    //"content-type": "application/json",
-                    //"Access-Control-Allow-Origin": '*'
-                },
-                success: function (data) {
-                    try {
-                        jSonDataDeserialized = JSON.parse(data);
-                        DecodejSONStudentData(jSonDataDeserialized);
-                        UpdatePagerForSide();
-                    }
-                    catch (Exception) {
-                       try {
-                            jSonDataDeserialized = JSON.parse(JSON.stringify(data));
-                            DecodejSONStudentData(jSonDataDeserialized);
-                            UpdatePagerForSide();
+            try {
+                    $(".StudentNames").AddPageComponentsDynamic(
+                        {
+                            Number_Of_Paging_Elements_On_Side: 6,
+                            MaxNumberOfPagerPagesInPagerSlider: 4,
+                            PagerClassName: "StudentNames",
+                            PagerStyleTable: true,
+                            UsePagerElementOnSideSelector: true,
+                            OwnCSSStyleName: "Current_Highlight",
                         }
-                        catch (Exception) {
-                            try {
-                                DecodejSONStudentData(data);
-                                UpdatePagerForSide();
-                            }
-                            catch (Exception) {
-                                $(".ErrorMessages").text(Exception);
-                            }
-                        }
-                    }
-                },
-                error: function (xhr, ajaxOptions, thrownError) {
-                    alert(xhr.status);
-                    alert(thrownError);
+                    );
                 }
-            });
+                catch (Exception) {
+                    $(".ErrorMessages").text(Exception);
+                }
         }
 
         function DecodejSONStudentData(jSonDataDeserialized) {
@@ -148,35 +104,68 @@
             $(".StudentData").append(WorkString);
         }
 
+        function GetStudentData() {
+            $(".StudentData").empty();
+
+            $.ajax({
+                url: WEB_API_URL_Student,
+                type: 'GET',
+                dataType: "json",
+                crossDomain:true,
+                headers: {
+                    accept: "application/json",
+                },
+                success: function (data) {
+                    //On ajax success do this
+                    try {
+                        jSonDataDeserialized = JSON.parse(data);
+                        DecodejSONStudentData(jSonDataDeserialized);
+                        UpdatePagerForSide();
+                    }
+                    catch (Exception) {
+                       try {
+                            jSonDataDeserialized = JSON.parse(JSON.stringify(data));
+                            DecodejSONStudentData(jSonDataDeserialized);
+                            UpdatePagerForSide();
+                        }
+                        catch (Exception) {
+                            try {
+                                DecodejSONStudentData(data);
+                                UpdatePagerForSide();
+                            }
+                            catch (Exception) {
+                                $(".ErrorMessages").text(Exception);
+                            }
+                        }
+                    }
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    //On ajax error do this
+                    alert(xhr.status);
+                    alert(ajaxOptions);
+                    alert(thrownError);
+                }
+            });
+        }
+
         $("#btnStudentNameHandle").click(function () {
             var StudentFirstAndLastName = $("#txtStudentFirstAndLastName").val();
             if (StudentOperation_ENUM.Save_Student_Data == CurrentUserSelection) {
                 var data = { StudentFirstAndLastName: StudentFirstAndLastName }
                 $.ajax({
                     url: WEB_API_URL_Student,
-                    method: 'POST',
                     type: 'POST',
-                    //contentType: 'application/json',
                     data: JSON.stringify(data),
-                    //crossDomain: true,
                     dataType: 'json',
-                    //mimeType: 'text/html',
-                    //contentType: 'text/html',
-                    //crossDomain: true,
-                    //headers: {
-                    //    "Access-Control-Allow-Origin": "*",
-                    //    "Accept": "application/json"
-                    //},
-
                     headers: {
                         accept: "application/json",
                         "content-type": "application/json",
-                        //"Access-Control-Allow-Origin": '*'
                     },
                     success: function (dataBack) {
                         //On ajax success do this
                         if (0 < dataBack) {
                             AddDataRowToTable(dataBack, StudentFirstAndLastName);
+                            UpdatePagerForSide();
                             $("#txtStudentFirstAndLastName").val("");
                         }
                         else {
@@ -185,8 +174,10 @@
                         }
                     },
                     error: function (xhr, ajaxOptions, thrownError) {
-                        //On error do this
+                        //On ajax error do this
+                        alert(xhr.status);
                         alert(ajaxOptions);
+                        alert(thrownError);
                     }
                 });
             }
@@ -195,13 +186,10 @@
                 $.ajax({
                     url: WEB_API_URL_Student + "?id=" + StudentNameID,
                     type: 'PUT',
-                    contentType: 'application/json',
                     data: JSON.stringify(data),
                     dataType: 'json',
-                    mimeType: 'text/html',
-                    contentType: 'text/html',
                     headers: {
-                        Accept: "application/json",
+                        accept: "application/json",
                         "content-type": "application/json",
                     },
                     success: function (dataBack) {
@@ -212,14 +200,17 @@
                             $("#txtStudentFirstAndLastName").val("");
                             CurrentUserSelection = StudentOperation_ENUM.Save_Student_Data;
                             HandleButtonValueAndText(CurrentUserSelection);
+                            UpdatePagerForSide();
                         }
                         else {
                             alert("Noget gik galt, da StudentName " + StudentFirstAndLastName + " skulle opdateres !!!");
                         }
                     },
                     error: function (xhr, ajaxOptions, thrownError) {
-                        //On error do this
+                        //On ajax error do this
+                        alert(xhr.status);
                         alert(ajaxOptions);
+                        alert(thrownError);
                     }
                 });
             }
@@ -236,25 +227,15 @@
                 $.ajax({
                     url: WEB_API_URL_Student + "?id=" + StudentNameID,
                     type: 'DELETE',
-                    contentType: 'application/json',
-                    dataType: 'json',
-                    mimeType: 'text/html',
-                    contentType: 'text/html',
-                    //headers: {
-                    //    "Access-Control-Allow-Origin": "*",
-                    //    "Accept": "application/json"
-                    //},
-                    headers: {
-                        Accept: "application/json",
-                        "content-type": "application/json",
-                    },
                     success: function (data) {
                         //On ajax success do this
                         CurrentRow.remove();
                     },
                     error: function (xhr, ajaxOptions, thrownError) {
-                        //On error do this
+                        //On ajax error do this
+                        alert(xhr.status);
                         alert(ajaxOptions);
+                        alert(thrownError);
                     }
                 });
             }
@@ -280,6 +261,13 @@
                 $("#btnStudentNameHandle").text("Ret Student Navn");
             }
         }
+
+        //$('.FirstPageButton').click(function (e) {
+        ////$('.paging li a.FirstPageButton').click(function (e) {
+        //    //$("body").on('click', ".paging li a.FirstPageButton", function (e) {
+        //    e.preventDefault();
+        //    alert("Så er der trykket på First Page Button (0) ");
+        //});
     });
 
 </script>

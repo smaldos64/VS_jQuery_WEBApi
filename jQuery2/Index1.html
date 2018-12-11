@@ -1,0 +1,108 @@
+﻿<!DOCTYPE html>
+
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>Test - Insert</title>
+    <!--<script src="Project_Scripts/Settings.js"></script>-->
+    <script type="text/javascript" src="Scripts/jquery-3.3.1.min.js"></script>
+    <link href="Content/bootstrap.css" rel="stylesheet" />
+    <script type="text/javascript" src="Scripts/bootstrap.js"></script>
+    <link href="StyleSheet/StyleSheet.css" rel="stylesheet" />
+    <script type="text/javascript" src="Project_Scripts/Settings.js"></script>
+    <script src="Project_Scripts/IndexHelper.js"></script>
+</head>
+
+<body>
+    <div class="row">
+        <div class="col-sm-12">
+            <button type="button" id="btnTest">Indsæt HTML Kode efter Tabel !!!</button>
+        </div>
+    </div>
+    <div class="table-responsive">
+        <table id="tblDynamic" class="table table-bordered">
+            <thead>
+                <tr>
+                    <td>Student ID</td>
+                    <td>Student Fornavn + Efternavn</td>
+                    <td>Ret Student</td>
+                    <td>Slet Student</td>
+                </tr>
+            </thead>
+            <tbody class="StudentData">
+                <tr>
+                    <td>1</td>
+                    <td>Lars</td>
+                    <td>Ret</td>
+                    <td>Slet</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <!--<div class="row">
+        <div class="col-sm-12">
+            <button type="button" id="btnTest">Indsæt HTML Kode efter Tabel !!!</button>
+        </div>
+    </div>-->
+    <div class="row">
+        <div class="col-sm-12">
+            <button type="button" id="btnTestAfter">Hvad sker der her !!!</button>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="paging">
+            <label for="lblthisPager" id="lblthisPager">Showing 1 - 3 of 4 entries </label>
+            <ul class="pagination">
+                <li>
+                    <a href="#" class="PrevNext FirstPageButton">F</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="row">
+        <nav aria-label="Page navigation example">
+            <ul class="pagination">
+                <li class="page-item"><a class="PrevNext PreviousPageButton page-link" href="#">Previous</a></li>
+                <li class="page-item"><a class="page-link" href="#">1</a></li>
+                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                <li class="page-item"><a class="page-link" href="#">Next</a></li>
+            </ul>
+        </nav>
+    </div>
+</body>
+
+</html>
+
+<!--<script type="text/javascript">
+    $(document).ready(function () {
+        var NumberOfButtonHits = 0;
+        $("#btnTest").click(function () {
+            PagingElementAfter = $(this).nextAll().text("Hej Kurt");
+            NumberOfButtonHits++;
+            //PagingElementAfter = $(this).after().text("Hej Lars " + NumberOfButtonHits);
+            //PagingElementAfter = $(this).nextAll().text("Hej Lars " + NumberOfButtonHits);
+
+            //PagingElementAfter = $("#tblDynamic").next().text("Hej Lars " + NumberOfButtonHits);
+            //$("#tblDynamic").after("<p>Test" + NumberOfButtonHits + "</p>");
+            $(".StudentData").closest("table").after("<h3></h3>");
+            $(".StudentData").closest("table").next().text("Hej Kurt " + NumberOfButtonHits);
+        });
+
+        //$("body").on('click', ".pagination li a.PreviousPageButton", function (e) {
+        //    e.preventDefault();
+        //    alert("Bruger trykkede på Prev knappen !!!");
+        //});
+
+        //$(".PreviousPageButton").click(function (e) {
+        //    e.preventDefault();
+        //    alert("Bruger trykkede på Prev knappen (0) !!!");
+        //});
+    });
+
+</script>-->
+
+

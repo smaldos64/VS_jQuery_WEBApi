@@ -1,6 +1,23 @@
 ﻿body {
+    margin-left : 20px;
+    margin-right: 20px;
 }
 
 #txtNumberOfRowsInTable{
     width: 800px;
+}
+
+/* Override the default bootstrap behavior where horizontal description lists 
+   will truncate terms that are too long to fit in the left column 
+*/
+.dl-horizontal dt {
+    white-space: normal;
+}
+
+.Current_Highlight {
+    text-decoration: underline;
+    font-style: italic;
+    font-weight: bold;
+    background-color: gold;
+    color : green;
 }

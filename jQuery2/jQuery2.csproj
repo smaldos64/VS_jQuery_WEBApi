@@ -77,6 +77,11 @@
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="Index.html" />
     <Content Include="Project_Scripts\IndexHelper.js" />
+    <Content Include="Project_Scripts\JavaScript_Paging_Dynamic10.js" />
+    <Content Include="Project_Scripts\JavaScript_Paging_Dynamic11.js" />
+    <Content Include="Project_Scripts\JavaScript_Paging_Dynamic12.js" />
+    <Content Include="Project_Scripts\JavaScript_Paging_Dynamic13.js" />
+    <Content Include="Project_Scripts\JavaScript_Paging_Dynamic9.js" />
     <Content Include="Project_Scripts\Settings.js" />
     <Content Include="Scripts\bootstrap.bundle.js" />
     <Content Include="Scripts\bootstrap.bundle.min.js" />
@@ -107,10 +112,12 @@
     <Content Include="Scripts\jquery-3.3.1.slim.js" />
     <Content Include="Scripts\jquery-3.3.1.slim.min.js" />
     <Content Include="Scripts\jquery.ajax-cross-origin.min.js" />
+    <Content Include="Scripts\jquery.validate.js" />
     <Content Include="Scripts\popper-utils.js" />
     <Content Include="Scripts\popper-utils.min.js" />
     <Content Include="Scripts\popper.js" />
     <Content Include="Scripts\popper.min.js" />
+    <Content Include="Scripts\respond.js" />
     <Content Include="Scripts\umd\popper-utils.js" />
     <Content Include="Scripts\umd\popper-utils.min.js" />
     <Content Include="Scripts\umd\popper.js" />
